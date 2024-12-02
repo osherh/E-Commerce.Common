@@ -1,0 +1,31 @@
+version: 0.2
+
+env:
+  variables:
+    CODEARTIFACT_DOMAIN: ecommerce
+    CODEARTIFACT_REPO: ecommerce-repo
+    REGION: eu-west-1
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto21
+    commands:
+      - curl "https://d1vvhvl2y92vvt.cloudfront.net/aws/codeartifact/latest/linux/x86_64/aws-codeartifact-<version>-linux-x86_64.zip" -o aws-codeartifact.zip
+      - unzip aws-codeartifact.zip
+      - mvn install
+
+  pre_build:
+    commands:
+      - echo Fetching AWS Account ID...
+      - export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - aws codeartifact login --tool mvn --repository $CODEARTIFACT_REPO --domain $CODEARTIFACT_DOMAIN --region $REGION
+
+  build:
+    commands:
+      - echo Deploying Maven package to AWS CodeArtifact...
+      - mvn deploy -DrepositoryId=aws-codeartifact -Durl=https://$AWS_ACCOUNT_ID.d.codeartifact.$REGION.amazonaws.com/maven/$CODEARTIFACT_REPO/ -Dusername=aws -Dpassword=$AWS_CODEARTIFACT_TOKEN
+
+artifacts:
+  files:
+    - target/*.jar
