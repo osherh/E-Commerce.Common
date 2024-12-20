@@ -49,10 +49,10 @@ Resources:
                   - "sts:GetCallerIdentity"
                 Resource: "*"
 
-  EcommerceCodeArtifactDomain:
-    Type: AWS::CodeArtifact::Domain
-    Properties:
-      DomainName: ecommerce
+#  EcommerceCodeArtifactDomain:
+#    Type: AWS::CodeArtifact::Domain
+#    Properties:
+#      DomainName: ecommerce
 
   EcommerceCodeArtifactRepository:
     Type: AWS::CodeArtifact::Repository
