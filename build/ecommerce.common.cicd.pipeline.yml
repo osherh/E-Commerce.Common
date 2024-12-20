@@ -71,20 +71,19 @@ Resources:
       Stages:
         - Name: Source
           Actions:
-            - Name: SourceAction
-              ActionTypeId:
-                Category: Source
-                Owner: ThirdParty
-                Provider: GitHub
-                Version: "1"
-              OutputArtifacts:
-                - Name: SourceOutput
-              Configuration:
-                Owner: osherh
-                Repo: E-Commerce.Common
-                Branch: main
-                OAuthToken: <GitHubOAuthToken>
-              RunOrder: 1
+        - Name: SourceAction
+          ActionTypeId:
+            Category: Source
+            Owner: AWS
+            Provider: CodeStarSourceConnection
+            Version: "1"
+          OutputArtifacts:
+            - Name: SourceOutput
+          Configuration:
+            ConnectionArn: arn:aws:codeconnections:$REGION:$AWS_ACCOUNT_ID:connection/cc85fe62-367a-437c-af2b-af0e40bebed9
+            FullRepositoryId: osherh/E-Commerce.Common
+            BranchName: main
+          RunOrder: 1
         - Name: Build
           Actions:
             - Name: BuildAction
