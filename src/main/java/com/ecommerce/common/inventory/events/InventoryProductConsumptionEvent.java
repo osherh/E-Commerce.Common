@@ -4,4 +4,4 @@ import java.util.UUID;
 
 import com.ecommerce.common.order.dto.OrderDTO;
 
-public record InventoryQuantityDecreaseFailureEvent(UUID orderId, OrderDTO orderDTO) {}
+public record InventoryProductConsumptionEvent(UUID orderId, OrderDTO orderDTO) {}
