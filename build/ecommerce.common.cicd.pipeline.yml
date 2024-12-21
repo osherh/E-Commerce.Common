@@ -27,6 +27,8 @@ Resources:
               - Effect: Allow
                 Action:
                   - "codestar-connections:UseConnection"
+                  - "codestar-connections:GetConnection"
+                  - "codestar-connections:ListConnections"
                 Resource:
                   - !Sub arn:aws:codeconnections:${AWS::Region}:${AWS::AccountId}:connection/d00409b5-4524-485e-b1c6-b33ebeaa70e5"
 
