@@ -53,12 +53,12 @@ Resources:
         Version: "2012-10-17"
         Statement:
           - Effect: Allow
-          - Action:
+            Action:
               - "codeartifact:GetAuthorizationToken"
             Resource:
               - !Sub arn:aws:codeartifact:${AWS::Region}:${AWS::AccountId}:domain/ecommerce
-            Effect: Allow
-          - Action:
+          - Effect: Allow
+            Action:
               - "codeartifact:GetRepositoryEndpoint"
               - "codeartifact:ReadFromRepository"
             Resource:
