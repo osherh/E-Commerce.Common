@@ -50,6 +50,7 @@ Resources:
   SharedPolicyDocument:
     Type: AWS::IAM::Policy
     Properties:
+      PolicyName: SharedPolicy
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -71,6 +72,9 @@ Resources:
             Action:
               - "sts:GetCallerIdentity"
             Resource: !Sub arn:aws:sts::${AWS::AccountId}:assumed-role/*
+      Roles:
+        - !Ref CodePipelineServiceRole
+        - !Ref CodeBuildServiceRole
 
   EcommerceCodeArtifactRepository:
     Type: AWS::CodeArtifact::Repository
