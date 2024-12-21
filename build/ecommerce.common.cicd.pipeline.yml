@@ -14,17 +14,23 @@ Resources:
               Service: codepipeline.amazonaws.com
             Action: "sts:AssumeRole"
       Policies:
+        - PolicyName: SharedPolicy
+          PolicyDocument: !Ref SharedPolicyDocument
         - PolicyName: CodePipelinePolicy
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
               - Effect: Allow
                 Action:
-                  - "codebuild:*"
-                  - "s3:*"
-                  - "codeartifact:*"
-                  - "sts:GetCallerIdentity"
-                Resource: "*"
+                  - "codebuild:BatchGetBuilds"
+                  - "codebuild:StartBuild"
+                Resource:
+                  - !Sub arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/${EcommerceCommonBuildProject}
+              - Effect: Allow
+                Action:
+                  - "codestar-connections:UseConnection"
+                Resource:
+                  - !Sub arn:aws:codestar-connections:${AWS::Region}:${AWS::AccountId}:connection/cc85fe62-367a-437c-af2b-af0e40bebed9
 
   CodeBuildServiceRole:
     Type: AWS::IAM::Role
@@ -38,21 +44,33 @@ Resources:
               Service: codebuild.amazonaws.com
             Action: "sts:AssumeRole"
       Policies:
-        - PolicyName: CodeBuildPolicy
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - "codeartifact:*"
-                  - "s3:*"
-                  - "sts:GetCallerIdentity"
-                Resource: "*"
+        - PolicyName: SharedPolicy
+          PolicyDocument: !Ref SharedPolicyDocument
 
-#  EcommerceCodeArtifactDomain:
-#    Type: AWS::CodeArtifact::Domain
-#    Properties:
-#      DomainName: ecommerce
+  SharedPolicyDocument:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "codeartifact:GetAuthorizationToken"
+              - "codeartifact:GetRepositoryEndpoint"
+              - "codeartifact:ReadFromRepository"
+            Resource:
+              - !Sub arn:aws:codeartifact:${AWS::Region}:${AWS::AccountId}:domain/ecommerce
+              - !Sub arn:aws:codeartifact:${AWS::Region}:${AWS::AccountId}:repository/ecommerce-common-repo
+          - Effect: Allow
+            Action:
+              - "s3:GetObject"
+              - "s3:PutObject"
+            Resource:
+              - !Sub arn:aws:s3:::${PipelineArtifactBucket}/*
+          - Effect: Allow
+            Action:
+              - "sts:GetCallerIdentity"
+            Resource: !Sub arn:aws:sts::${AWS::AccountId}:assumed-role/*
 
   EcommerceCodeArtifactRepository:
     Type: AWS::CodeArtifact::Repository
