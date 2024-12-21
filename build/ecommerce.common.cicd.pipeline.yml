@@ -62,7 +62,7 @@ Resources:
               - "codeartifact:GetRepositoryEndpoint"
               - "codeartifact:ReadFromRepository"
             Resource:
-              - !Sub arn:aws:codeartifact:${AWS::Region}:${AWS::AccountId}:repository/ecommerce-common-repo
+              - !Sub arn:aws:codeartifact:${AWS::Region}:${AWS::AccountId}:repository/ecommerce/ecommerce-common-repo
           - Effect: Allow
             Action:
               - "s3:GetObject"
