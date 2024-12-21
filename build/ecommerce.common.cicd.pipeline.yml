@@ -24,11 +24,11 @@ Resources:
                   - "codebuild:StartBuild"
                 Resource:
                   - !Sub arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/${EcommerceCommonBuildProject}
-              - Effect: Allow
-                Action:
-                  - "codestar-connections:UseConnection"
-                Resource:
-                  - !Sub arn:aws:codestar-connections:${AWS::Region}:${AWS::AccountId}:connection/cc85fe62-367a-437c-af2b-af0e40bebed9
+              #- Effect: Allow
+              #  Action:
+              #    - "codestar-connections:UseConnection"
+              #  Resource:
+              #    - !Sub arn:aws:codeconnections:${AWS::Region}:${AWS::AccountId}:connection/d00409b5-4524-485e-b1c6-b33ebeaa70e5
 
   CodeBuildServiceRole:
     Type: AWS::IAM::Role
@@ -100,7 +100,7 @@ Resources:
               OutputArtifacts:
                 - Name: SourceOutput
               Configuration:
-                ConnectionArn: !Sub "arn:aws:codestar-connections:${AWS::Region}:${AWS::AccountId}:connection/cc85fe62-367a-437c-af2b-af0e40bebed9"
+                ConnectionArn: !Sub "arn:aws:codeconnections:${AWS::Region}:${AWS::AccountId}:connection/d00409b5-4524-485e-b1c6-b33ebeaa70e5"
                 FullRepositoryId: osherh/E-Commerce.Common
                 BranchName: main
               RunOrder: 1
