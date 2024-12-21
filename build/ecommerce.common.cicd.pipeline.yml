@@ -14,8 +14,6 @@ Resources:
               Service: codepipeline.amazonaws.com
             Action: "sts:AssumeRole"
       Policies:
-        - PolicyName: SharedPolicy
-          PolicyDocument: !Ref SharedPolicyDocument
         - PolicyName: CodePipelinePolicy
           PolicyDocument:
             Version: "2012-10-17"
@@ -43,24 +41,27 @@ Resources:
             Principal:
               Service: codebuild.amazonaws.com
             Action: "sts:AssumeRole"
-      Policies:
-        - PolicyName: SharedPolicy
-          PolicyDocument: !Ref SharedPolicyDocument
 
   SharedPolicyDocument:
     Type: AWS::IAM::Policy
     Properties:
+      Roles:
+        - !Ref CodePipelineServiceRole
+        - !Ref CodeBuildServiceRole      
       PolicyName: SharedPolicy
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
           - Effect: Allow
-            Action:
+          - Action:
               - "codeartifact:GetAuthorizationToken"
+            Resource:
+              - !Sub arn:aws:codeartifact:${AWS::Region}:${AWS::AccountId}:domain/ecommerce
+            Effect: Allow
+          - Action:
               - "codeartifact:GetRepositoryEndpoint"
               - "codeartifact:ReadFromRepository"
             Resource:
-              - !Sub arn:aws:codeartifact:${AWS::Region}:${AWS::AccountId}:domain/ecommerce
               - !Sub arn:aws:codeartifact:${AWS::Region}:${AWS::AccountId}:repository/ecommerce-common-repo
           - Effect: Allow
             Action:
@@ -72,9 +73,6 @@ Resources:
             Action:
               - "sts:GetCallerIdentity"
             Resource: !Sub arn:aws:sts::${AWS::AccountId}:assumed-role/*
-      Roles:
-        - !Ref CodePipelineServiceRole
-        - !Ref CodeBuildServiceRole
 
   EcommerceCodeArtifactRepository:
     Type: AWS::CodeArtifact::Repository
