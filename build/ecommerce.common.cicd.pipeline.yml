@@ -2,10 +2,10 @@ AWSTemplateFormatVersion: "2010-09-09"
 
 Resources:
 
-  CodePipelineServiceRole:
+  CommonPipelineRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: CodePipelineServiceRole
+      RoleName: CommonPipelineRole
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -14,7 +14,7 @@ Resources:
               Service: codepipeline.amazonaws.com
             Action: "sts:AssumeRole"
       Policies:
-        - PolicyName: CodePipelinePolicy
+        - PolicyName: CommonPipelinePolicy
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -31,10 +31,10 @@ Resources:
                 Resource:
                   - !Sub arn:aws:codeconnections:${AWS::Region}:${AWS::AccountId}:connection/f3aa899b-d38e-48a8-8f9a-7095e7bf7f46
 
-  CodeBuildServiceRole:
+  CommonBuildRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: CodeBuildServiceRole
+      RoleName: CommonBuildRole
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -43,7 +43,7 @@ Resources:
               Service: codebuild.amazonaws.com
             Action: "sts:AssumeRole"
       Policies:
-        - PolicyName: CodeBuildPolicy
+        - PolicyName: CommonBuildPolicy
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -54,13 +54,13 @@ Resources:
                   - "logs:PutLogEvents"
                 Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/*
 
-  SharedPolicyDocument:
+  CommonSharedPolicyDocument:
     Type: AWS::IAM::Policy
     Properties:
       Roles:
-        - !Ref CodePipelineServiceRole
-        - !Ref CodeBuildServiceRole      
-      PolicyName: SharedPolicy
+        - !Ref CommonPipelineRole
+        - !Ref CommonBuildRole
+      PolicyName: CommonSharedPolicy
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -99,7 +99,7 @@ Resources:
     Type: AWS::CodePipeline::Pipeline
     Properties:
       Name: ecommerce-common-pipeline
-      RoleArn: !GetAtt CodePipelineServiceRole.Arn
+      RoleArn: !GetAtt CommonPipelineRole.Arn
       ArtifactStore:
         Type: S3
         Location: !Ref PipelineArtifactBucket
@@ -149,14 +149,14 @@ Resources:
       Artifacts:
         Type: CODEPIPELINE
         Name: BuildOutput
-      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+      ServiceRole: !GetAtt CommonBuildRole.Arn
 
   PipelineArtifactBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: ecommerce-common-pipeline-artifacts
+      BucketName: ecommerce-common-artifacts
 
-  PipelineArtifactBucketPolicy:
+  CommonArtifactBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
       Bucket: !Ref PipelineArtifactBucket
@@ -169,13 +169,13 @@ Resources:
               - "s3:GetObject"
             Resource: !Sub arn:aws:s3:::${PipelineArtifactBucket}/*
             Principal:
-              AWS: !GetAtt CodePipelineServiceRole.Arn
+              AWS: !GetAtt CommonPipelineRole.Arn
 
 Outputs:
   PipelineName:
-    Description: "The name of the CodePipeline"
+    Description: "E-Commerce Common CodePipeline"
     Value: !Ref EcommerceCommonPipeline
 
   BuildProjectName:
-    Description: "The name of the CodeBuild project"
+    Description: "E-Commerce Common CodeBuild project"
     Value: !Ref EcommerceCommonBuildProject
