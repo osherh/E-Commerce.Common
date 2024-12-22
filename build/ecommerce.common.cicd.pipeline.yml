@@ -26,11 +26,10 @@ Resources:
                   - !Sub arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:project/${EcommerceCommonBuildProject}
               - Effect: Allow
                 Action:
-                  - "codestar-connections:UseConnection"
-                  - "codestar-connections:GetConnection"
-                  - "codestar-connections:ListConnections"
+                  - "codestar-connections:*"
+                  - "codeconnections:*"
                 Resource:
-                  - !Sub arn:aws:codeconnections:${AWS::Region}:${AWS::AccountId}:connection/d00409b5-4524-485e-b1c6-b33ebeaa70e5"
+                  - !Sub arn:aws:codeconnections:${AWS::Region}:${AWS::AccountId}:connection/f3aa899b-d38e-48a8-8f9a-7095e7bf7f46
 
   CodeBuildServiceRole:
     Type: AWS::IAM::Role
@@ -43,6 +42,16 @@ Resources:
             Principal:
               Service: codebuild.amazonaws.com
             Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: CodeBuildPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/ecommerce-common-build:log-stream/*
 
   SharedPolicyDocument:
     Type: AWS::IAM::Policy
@@ -71,10 +80,13 @@ Resources:
               - "s3:PutObject"
             Resource:
               - !Sub arn:aws:s3:::${PipelineArtifactBucket}/*
+#             - arn:aws:s3:::ecommerce-common-pipeline-artifacts
+#             - arn:aws:s3:::ecommerce-common-pipeline-artifacts/*
           - Effect: Allow
             Action:
               - "sts:GetCallerIdentity"
-            Resource: !Sub arn:aws:sts::${AWS::AccountId}:assumed-role/*
+            #Resource: !Sub arn:aws:sts::${AWS::AccountId}:assumed-role/*
+            Resource: "*"
 
   EcommerceCodeArtifactRepository:
     Type: AWS::CodeArtifact::Repository
@@ -102,7 +114,7 @@ Resources:
               OutputArtifacts:
                 - Name: SourceOutput
               Configuration:
-                ConnectionArn: !Sub "arn:aws:codeconnections:${AWS::Region}:${AWS::AccountId}:connection/d00409b5-4524-485e-b1c6-b33ebeaa70e5"
+                ConnectionArn: !Sub "arn:aws:codeconnections:${AWS::Region}:${AWS::AccountId}:connection/f3aa899b-d38e-48a8-8f9a-7095e7bf7f46"
                 FullRepositoryId: osherh/E-Commerce.Common
                 BranchName: main
               RunOrder: 1
@@ -142,6 +154,21 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: ecommerce-common-pipeline-artifacts
+
+  PipelineArtifactBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref PipelineArtifactBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "s3:PutObject"
+              - "s3:GetObject"
+            Resource: !Sub arn:aws:s3:::${PipelineArtifactBucket}/*
+            Principal:
+              AWS: !GetAtt CodePipelineServiceRole.Arn
 
 Outputs:
   PipelineName:
