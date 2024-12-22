@@ -49,9 +49,10 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                  - "logs:CreateLogGroup"
                   - "logs:CreateLogStream"
                   - "logs:PutLogEvents"
-                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/ecommerce-common-build:log-stream/*
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/*
 
   SharedPolicyDocument:
     Type: AWS::IAM::Policy
@@ -140,7 +141,7 @@ Resources:
       Name: ecommerce-common-build
       Source:
         Type: CODEPIPELINE
-        BuildSpec: "buildspec.yml"
+        BuildSpec: "build/buildspec.yml"
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Image: aws/codebuild/standard:5.0

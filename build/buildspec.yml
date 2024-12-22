@@ -3,7 +3,7 @@ version: 0.2
 env:
   variables:
     CODEARTIFACT_DOMAIN: ecommerce
-    CODEARTIFACT_REPO: ecommerce-repo
+    CODEARTIFACT_REPO: ecommerce-common-repo
     REGION: eu-west-1
 
 phases:
@@ -11,7 +11,7 @@ phases:
     runtime-versions:
       java: corretto21
     commands:
-      - curl "https://d1vvhvl2y92vvt.cloudfront.net/aws/codeartifact/latest/linux/x86_64/aws-codeartifact-<version>-linux-x86_64.zip" -o aws-codeartifact.zip
+      - curl "https://d1vvhvl2y92vvt.cloudfront.net/aws/codeartifact/latest/linux/x86_64/aws-codeartifact-2.22.19-linux-x86_64.zip" -o aws-codeartifact.zip
       - unzip aws-codeartifact.zip
       - mvn install
 
